@@ -6,7 +6,7 @@ package com.haroldadmin.opengraphKt
  * The keys in the map contain the value of the 'property' attribute from <meta> tags, and the values for each key
  * are all the <meta> tags containing this exact 'property'.
  */
-inline class Tags(private val tags: Map<String, List<String>>) {
+inline class Tags(val map: Map<String, List<String>>) {
 
     /**
      * Get the first "title" og-tag from the web page, if any
@@ -36,7 +36,7 @@ inline class Tags(private val tags: Map<String, List<String>>) {
      * Get all "og:title" values on the web page.
      */
     fun allTitles(): List<String> {
-        return tags["title"] ?: emptyList()
+        return map["title"] ?: emptyList()
     }
 
     /**
@@ -50,14 +50,14 @@ inline class Tags(private val tags: Map<String, List<String>>) {
      * Get all the "og:description" tags on the web page
      */
     fun allDescriptions(): List<String> {
-        return tags["description"] ?: emptyList()
+        return map["description"] ?: emptyList()
     }
 
     /**
      * Get all the "og:url" tags on the web page
      */
     fun allUrls(): List<String> {
-        return tags["url"] ?: emptyList()
+        return map["url"] ?: emptyList()
     }
 
     /**
@@ -82,15 +82,29 @@ inline class Tags(private val tags: Map<String, List<String>>) {
      * ```
      */
     fun getProperties(name: String): List<String> {
-        return tags[name] ?: emptyList()
+        return map[name] ?: emptyList()
     }
 
     private fun extractImageUrl(): List<String> {
-        return tags["image"] ?: tags["image:url"] ?: tags["image:secure_url"] ?: emptyList()
+        return map["image"] ?: map["image:url"] ?: map["image:secure_url"] ?: emptyList()
     }
 
     override fun toString(): String = buildString {
-        tags.forEach { (property, content) -> appendln("$property: $content") }
+        map.forEach { (property, content) -> appendln("$property: $content") }
     }
 }
 
+
+/**
+ * A helper method to merge two instances of Tags. When keys collide, it concatenates
+ * the values.
+ */
+fun Tags.merge(other: Tags): Tags {
+    val result = this.map.toMutableMap()
+
+    other.map.entries.forEach {
+        result[it.key] = (result[it.key] ?: emptyList()) + it.value
+    }
+
+    return Tags(result)
+}

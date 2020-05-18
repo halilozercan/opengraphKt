@@ -40,10 +40,15 @@ internal object Parser {
                 .filter { it.isOpenGraphTag() }
                 .groupBy { it.propertyWithoutOgTag() }
                 .mapValues { openGraphTag ->
-                    openGraphTag.value.map { element -> element.attr("content") }
+                    openGraphTag.value.map { element -> element.attr("content") }.toMutableList()
                 }
 
+        val miscDescriptors = mapOf(
+                "title" to listOf<String>(document.title())
+        )
+
         Tags(openGraphTags)
+                .merge(Tags(miscDescriptors))
     }
 
     private fun Element.isOpenGraphTag(): Boolean {
