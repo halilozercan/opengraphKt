@@ -28,6 +28,16 @@ suspend fun URL.getOpenGraphTags(): Tags {
 }
 
 /**
+ * Parses the given HTML and returns the parsed Open-Graph tags
+ *
+ * The parsed tags are NOT cached in memory.
+ * The parsing is performed on [kotlinx.coroutines.Dispatchers.Default]
+ */
+suspend fun String.getOpenGraphTags(): Tags {
+    return Parser.parse(this)
+}
+
+/**
  * Reads the text from the given file, and returns the parsed Open-Graph tags
  *
  * The parsed tags are **NOT** cached in memory. This method exists mostly for testing
